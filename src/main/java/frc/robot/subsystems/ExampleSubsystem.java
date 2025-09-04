@@ -43,5 +43,33 @@ public class ExampleSubsystem extends SubsystemBase {
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
+<<<<<<< Updated upstream
+=======
+  }
+
+  @Override
+  public void reportToSmartDashboard(LOG_LEVEL priority){
+    switch (priority){
+      case OFF:
+        break;
+      case ALL:
+      SmartDashboard.putNumber("Climb Position", motor.getPosition().getValueAsDouble());
+      SmartDashboard.putNumber("Motor Temp", motor.getDeviceTemp().getValueAsDouble());
+      SmartDashboard.putNumber("Climb Voltage", motor.getMotorVoltage().getValueAsDouble());
+      case MEDIUM:
+      SmartDashboard.putNumber("Motor Temp", motor.getDeviceTemp().getValueAsDouble());
+      SmartDashboard.putNumber("Climb Voltage", motor.getMotorVoltage().getValueAsDouble());
+      case MINIMAL:
+      SmartDashboard.putNumber("Climb Position", motor.getPosition().getValueAsDouble());
+    }
+  }
+  
+  @Override
+  public void initShuffleboard(LOG_LEVEL priority) {
+      ShuffleboardTab tab = Shuffleboard.getTab("Example Subsystem");
+      tab.addNumber("Climb Position", () -> motor.getPosition().getValueAsDouble());
+      tab.addNumber("Motor Temp", () -> motor.getDeviceTemp().getValueAsDouble());
+      tab.addNumber("Climb Voltage", () -> motor.getMotorVoltage().getValueAsDouble());
+>>>>>>> Stashed changes
   }
 }
