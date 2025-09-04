@@ -3,73 +3,101 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExampleSubsystem extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+public class ExampleSubsystem extends SubsystemBase implements Reportable{
+  private final TalonFX motor;
+
+  private double desiredSpeed = 0.0;
+  private boolean enabled = true;
+  private TalonFXConfigurator motorConfigurator;
+  private VelocityVoltage velocityRequest;
+  private final NeutralOut neutralRequest = new NeutralOut();
+  public ExampleSubsystem() {
+    motor = new TalonFX(0);
+    velocityRequest = new VelocityVoltage(0);
+
+   motorConfigurator = motor.getConfigurator();
+
+    setMotorConfigs();
+
+    velocityRequest = new VelocityVoltage(0);
+
+    CommandScheduler.getInstance().registerSubsystem(this);
+  }
 
   /**
    * Example command factory method.
    *
    * @return a command
    */
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
-  }
+    public void setMotorConfigs(){
+      TalonFXConfiguration motorConfigs = new TalonFXConfiguration();
+
+    }
+
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *
    * @return value of some boolean subsystem stathe, such as a digital sensor.
    */
-  public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (!enabled){
+      return;
+    }
+
+    velocityRequest.Velocity = desiredSpeed;
+
+    motor.setControl(velocityRequest);
+  }
+  public void setEnabled(boolean enabled){
+    this.enabled = enabled;
+    if(!enabled){
+      motor.setControl(neutralRequest);
+    } 
   }
 
-  @Override
-  public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
-<<<<<<< Updated upstream
-=======
+  public void setTargetSpeed(double speed){
+    desiredSpeed = speed;
   }
 
-  @Override
+  public double getSpeed(){
+    return motor.getVelocity().getValueAsDouble();
+  }
+
+  public double getTargetSpeed(){
+    return desiredSpeed;
+  }
+
+  public boolean atSpeed(){
+    return motor.getVelocity().getValueAsDouble() > desiredSpeed;
+  }
+
   public void reportToSmartDashboard(LOG_LEVEL priority){
+  
+  }
+
+  @Override
+  public void initShuffleboard(LOG_LEVEL priority){
     switch (priority){
       case OFF:
         break;
       case ALL:
-      SmartDashboard.putNumber("Climb Position", motor.getPosition().getValueAsDouble());
-      SmartDashboard.putNumber("Motor Temp", motor.getDeviceTemp().getValueAsDouble());
-      SmartDashboard.putNumber("Climb Voltage", motor.getMotorVoltage().getValueAsDouble());
+
       case MEDIUM:
-      SmartDashboard.putNumber("Motor Temp", motor.getDeviceTemp().getValueAsDouble());
-      SmartDashboard.putNumber("Climb Voltage", motor.getMotorVoltage().getValueAsDouble());
+      
       case MINIMAL:
-      SmartDashboard.putNumber("Climb Position", motor.getPosition().getValueAsDouble());
     }
-  }
-  
-  @Override
-  public void initShuffleboard(LOG_LEVEL priority) {
-      ShuffleboardTab tab = Shuffleboard.getTab("Example Subsystem");
-      tab.addNumber("Climb Position", () -> motor.getPosition().getValueAsDouble());
-      tab.addNumber("Motor Temp", () -> motor.getDeviceTemp().getValueAsDouble());
-      tab.addNumber("Climb Voltage", () -> motor.getMotorVoltage().getValueAsDouble());
->>>>>>> Stashed changes
+
   }
 }
