@@ -9,6 +9,8 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -27,8 +29,6 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
    motorConfigurator = motor.getConfigurator();
 
     setMotorConfigs();
-
-    velocityRequest = new VelocityVoltage(0);
 
     CommandScheduler.getInstance().registerSubsystem(this);
   }
@@ -89,14 +89,17 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
 
   @Override
   public void initShuffleboard(LOG_LEVEL priority){
+    ShuffleboardTab tab = Shuffleboard.getTab("Motor");
     switch (priority){
       case OFF:
         break;
       case ALL:
-
+      tab.addNumber("Motor Current Position", () -> getSpeed());
       case MEDIUM:
       
       case MINIMAL:
+        tab.addNumber("Motor Voltage", () -> motor.getMotorVoltage().getValueAsDouble());
+        tab.addNumber("Motor Temperature", () -> motor.getDeviceTemp().getValueAsDouble());
     }
 
   }
