@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.Enable5VRailValue;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -65,6 +66,11 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
     if(!enabled){
       motor.setControl(neutralRequest);
     } 
+
+  }
+
+  public boolean getEnabled() {
+    return enabled;
   }
 
   public void setTargetSpeed(double speed){
@@ -84,7 +90,7 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
   }
 
   public void reportToSmartDashboard(LOG_LEVEL priority){
-  
+
   }
 
   @Override
@@ -95,8 +101,11 @@ public class ExampleSubsystem extends SubsystemBase implements Reportable{
         break;
       case ALL:
       tab.addNumber("Motor Current Position", () -> getSpeed());
+      tab.addNumber("Supply Current", () -> motor.getSupplyCurrent().getValueAsDouble());
+      tab.addNumber("Feedforward", () -> motor.getClosedLoopFeedForward().getValueAsDouble());
       case MEDIUM:
-      
+      tab.addNumber("Motor Target Position", () -> getSpeed());
+      tab.addBoolean("enabled", () -> getEnabled());
       case MINIMAL:
         tab.addNumber("Motor Voltage", () -> motor.getMotorVoltage().getValueAsDouble());
         tab.addNumber("Motor Temperature", () -> motor.getDeviceTemp().getValueAsDouble());
